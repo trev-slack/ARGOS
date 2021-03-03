@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Set Robot Description -->
+  <param name="/argos/robot_description" command="cat '$(find argos_description)/urdf/argos.urdf'"/>
+  <!-- Publish the robot joints. -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns="argos">
+    <param name="tf_prefix"         value="argos"/>
+    <param name="robot_description" value="/argos/robot_description"/>
+    <param name="robotParam" value="/argos/robot_description"/>
+  </node>
+</launch>

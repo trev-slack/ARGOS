@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<!-- Generates ARGOS in Gazebo and launches the control/localization packages -->
+     
+<launch>
+  <!-- Arguments to set the namespace, start position. -->
+  <arg name="ns"        default="argos"/>			
+  <arg name="x"         default="0"/>
+  <arg name="y"         default="0"/>
+  <arg name="z"         default="0"/>
+  <arg name="roll"      default="0"/>
+  <arg name="pitch"     default="0"/>
+  <arg name="yaw"       default="0"/>
+  <arg name="use_global_ekf" default="true"/>
+
+  <!-- Generate the model for gazebo and publish the robots joint states. -->
+  <include file="$(find argos_description)/launch/argos_description.launch"/>
+
+  <!-- Launch the control portion of the argos robot. -->
+  <include file="$(find argos_control)/launch/argos_control.launch">
+    <arg name="use_global_ekf" value="$(arg use_global_ekf)"/>
+  </include>
+
+  <!-- Spawn the model into gazebo. -->
+  <node name="spawn_create_model" pkg="gazebo_ros" type="spawn_model" ns="$(arg ns)"
+    args="-x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)
+    -urdf -param /$(arg ns)/robot_description -model $(arg ns)"/>
+</launch>
