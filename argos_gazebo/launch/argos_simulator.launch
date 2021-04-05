@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<!-- Simulate ARGOS in Gazebo -->
+
+<launch>
+  <arg name="ns"        default="argos"/>
+  <arg name="gui"       default="true"/>
+  <arg name="rviz"      default="false"/>
+
+  <!-- Start Gazebo with an empty world. -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui"          value="$(arg gui)"/>
+    <arg name="world_name"   value="$(find argos_gazebo)/worlds/type_d.world"/>
+  </include>
+  
+  <!-- Spawn the robot. -->
+  <include file="$(find argos_base)/launch/argos_base.launch">
+    <arg name="ns"             value="$(arg ns)"/>
+    <arg name="use_global_ekf" value="true"/>
+  </include>
+
+  <!-- navigation -->
+  <include file="$(find argos_nav)/launch/argos_nav.launch">
+    <arg name="ns"             value="$(arg ns)"/>
+  </include>
+  
+  <!-- Arduino -->
+  <node pkg ="rosserial_python" name="arduino_node" type="serial_node.py" args="/dev/ttyACM0"/>
+
+  <!-- Comms -->
+  <node pkg="argos_control" name="comms_node" type="comms_node.py" output="screen"/>
+
+  <!-- Loss of Comms -->
+  <node pkg="argos_control" name="path_follow" type="path_follow.py" output="screen"/>
+  
+  <!-- GUI -->
+<!--   <node pkg="argos_control" name="argos_gui" type="argos_gui.py" args="40.01073577575442 -105.24391045294978" output="screen"/> -->
+  
+  <!-- Launch RViz-->
+<!--   
+  <group if="$(arg rviz)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find argos_tutorials)/rviz/jackal_with_gps.rviz" >
+      <remap from="/move_base_simple/goal" to="/$(arg ns)/move_base_simple/goal"/>
+    </node>
+  </group> -->
+</launch>

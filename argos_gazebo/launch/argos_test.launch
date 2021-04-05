@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<!-- GPS, Lidar, Camera, IMU -->
+
+<launch>
+
+  <arg name="ns"        default="argos"/>
+  <arg name="gui"       default="true"/>
+  <arg name="rviz"      default="true"/>
+  <!--This specifies the sensor package -->
+  <arg name="config"    default="lidar_flea"/>
+  <arg name="config_id" default="0"/>
+  <arg name="world"      default="type_d.world"/>
+  <!--Configure the follow waypoints behavior -->
+  <arg name="wapoint_distance" default="0.5"/>
+  <arg name="x_start"        default="0"/>
+  <arg name="y_start"        default="0"/>
+  <arg name="waypoints_number" default="2"/>
+  <!-- Start Gazebo with an empty world. -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui"          value="$(arg gui)"/>
+	  <arg name="world_name"   value="$(find argos_gazebo)/worlds/$(arg world)"/>
+  </include>
+  
+  <!-- Spawn the robot. -->
+  <include file="$(find multi_jackal_base)/launch/jackal_base.launch">
+    <arg name="ns"             value="$(arg ns)"/>
+    <arg name="config"         value="$(arg config)"/>
+    <arg name="config_id"      value="$(arg config_id)"/>
+    <arg name="use_move_base"  value="true"/>
+    <arg name="use_global_ekf" value="true"/>
+    <arg name="use_global_tf"  value="false"/>
+    <!-- <arg name="z"			   value=".1"/> -->
+    <arg name="x"			   value="$(arg x_start)"/>
+    <arg name="y"			   value="$(arg y_start)"/>
+<!--     <arg name='yaw'			   value="3.14159"/> -->
+  </include>
+
+  <!-- View in RVIZ. -->
+  <group if="$(arg rviz)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find argos_gazebo)/resources/argos_nav.rviz" >
+      <remap from="/move_base_simple/goal" to="/$(arg ns)/move_base_simple/goal"/>
+    </node>
+  </group>
+
+  <!-- start timer node -->
+<!--   <node name="goal_reached" pkg="argos_gazebo" type="goal_reached.py"/> -->
+
+  <!-- start waypoint node -->
+<!--   <node name="waypoint_pub" pkg="argos_gazebo" type="waypoint_pub.py" args="$(arg waypoints_number)"/> -->
+
+</launch>
+
+<!-- <arg name="world_name"   value="$(find argos_gazebo)/worlds/$(arg world)"/> -->
